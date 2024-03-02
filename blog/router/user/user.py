@@ -4,17 +4,18 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 from blog import models, schemas
 from ...database import get_db
-from ...hashing import hashing_password
+from ...hashing import Hash
 
 router = APIRouter()
 
 
 @router.post("/create_user", response_model=schemas.ShowUser)
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
+    hash_instance = Hash()
     new_user = models.User(
         username=request.username,
         email=request.email,
-        password=hashing_password(request.password),
+        password=hash_instance.hashing_password(request.password),
     )
     db.add(new_user)
     db.commit()
